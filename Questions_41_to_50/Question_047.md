@@ -1,0 +1,10 @@
+# Question 47
+
+## Question:
+
+<!-- Enter the question here -->
+
+## Answer:
+
+<!-- Enter the answer here -->
+
