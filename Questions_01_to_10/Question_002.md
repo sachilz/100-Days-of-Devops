@@ -15,9 +15,10 @@ To create a user with a specific expiry date on a Linux server, use the `useradd
 **Step-by-step solution:**
 
 1. **SSH into the server:** 
-   Connect to App Server 2 using the details provided in the infrastructure section.
+   Connect to App Server 2 using the details provided in the [Infrastructure Details](Infrastructure_Details.md) reference.
+   For App Server 2 (`stapp02`), the user is `steve` and the password is `Am3ric@`:
    ```bash
-   ssh <username>@stapp02
+   ssh steve@stapp02
    ```
 
 2. **Create the user:** 
