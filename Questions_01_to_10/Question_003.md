@@ -1,44 +1,39 @@
-# Question 3
+# Question 4
 
 ## Question:
 
-Following security audits, the xFusionCorp Industries security team has rolled out new protocols, including the restriction of direct root SSH login.
+In a bid to automate backup processes, the xFusionCorp Industries sysadmin team has developed a new bash script named `xfusioncorp.sh`. While the script has been distributed to all necessary servers, it lacks executable permissions on App Server 1 within the Stratos Datacenter.
 
-Your task is to disable direct SSH root login on all app servers within the Stratos Datacenter.
+Your task is to grant executable permissions to the `/tmp/xfusioncorp.sh` script on App Server 1. Additionally, ensure that all users have the capability to execute it.
 
 ## Answer:
 
-To disable direct SSH root login on Linux servers, you need to modify the SSH daemon configuration file (`sshd_config`) and restart the SSH service.
+*Refer to the [Infrastructure Details](Infrastructure_Details.md) for server credentials if needed.*
+
+To grant executable permissions to a file so that all users can execute it, you can use the `chmod` command with the absolute mode `755`.
 
 **Step-by-step solution:**
 
-1. **SSH into each app server:** 
-   You need to perform this task on all app servers. Use the credentials from the [Infrastructure Details](Infrastructure_Details.md) reference:
-   - App Server 1 (`stapp01`): `ssh tony@stapp01` (Password: `Ir0nM@n`)
-   - App Server 2 (`stapp02`): `ssh steve@stapp02` (Password: `Am3ric@`)
-   - App Server 3 (`stapp03`): `ssh banner@stapp03` (Password: `BigGr33n`)
-
-2. **Edit the SSH configuration file:** 
-   Open the `/etc/ssh/sshd_config` file using a text editor like `vi` or `nano` with `sudo` privileges:
+1. **SSH into App Server 1:** 
+   Connect to App Server 1 (`stapp01`) using the credentials from the [Infrastructure Details](Infrastructure_Details.md) reference. The user is `tony` and the password is `Ir0nM@n`:
    ```bash
-   sudo vi /etc/ssh/sshd_config
+   ssh tony@stapp01
    ```
 
-3. **Disable root login:** 
-   Find the line that contains `PermitRootLogin`. It might be commented out with a `#` or set to `yes` (or `prohibit-password`). 
-   To edit this in the `vi` editor:
-   - Press the `i` key on your keyboard to enter **Insert Mode**.
-   - Modify the line to exactly: `PermitRootLogin no` (make sure to remove the `#` at the beginning if there is one).
-   - Press the `Esc` key to exit Insert Mode.
-   - Type `:wq` and press `Enter` to save the file and quit the editor.
-
-4. **Test and restart the SSH service:** 
-   Before restarting the service, it's a best practice to test the SSH configuration for any syntax errors. If the test passes, restart the daemon, and then `exit` to disconnect from the server:
+2. **Grant executable permissions:** 
+   Use the `chmod` command with the absolute mode `755` (read, write, execute for owner; read and execute for group and others) to ensure the script is executable by everyone:
    ```bash
-   sudo sshd -t
-   sudo systemctl restart sshd
+   sudo chmod 755 /tmp/xfusioncorp.sh
+   ```
+
+3. **Verify the permissions:** 
+   Check the file permissions using the `ls -l` command to ensure the `x` (executable) bit is set for the owner, group, and others:
+   ```bash
+   ls -l /tmp/xfusioncorp.sh
+   ```
+   *You should see an output containing `rwxr-xr-x` (or similar), indicating that the `x` flag is present for user, group, and others.*
+
+4. **Exit the server:**
+   ```bash
    exit
    ```
-
-5. **Repeat:** 
-   Ensure you repeat steps 1-4 for **all** the app servers specified in the Datacenter infrastructure.

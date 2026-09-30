@@ -1,35 +1,46 @@
-# Question 2
+# Question 3
 
 ## Question:
 
-As part of the temporary assignment to the Nautilus project, a developer named kareem requires access for a limited duration. To ensure smooth access management, a temporary user account with an expiry date is needed.
+Following security audits, the xFusionCorp Industries security team has rolled out new protocols, including the restriction of direct root SSH login.
 
-Create a user named kareem on App Server 2 in Stratos Datacenter. Set the expiry date to 2027-04-15, ensuring the user is created in lowercase as per standard protocol.
-
-*Note: You can find the infrastructure details by clicking on the Details of all Users and Servers button on the top-right section of the page.*
+Your task is to disable direct SSH root login on all app servers within the Stratos Datacenter.
 
 ## Answer:
 
-To create a user with a specific expiry date on a Linux server, use the `useradd` command with the `-e` (expiredate) flag. The date must be provided in the format `YYYY-MM-DD`.
+*Refer to the [Infrastructure Details](Infrastructure_Details.md) for server credentials if needed.*
+
+To disable direct SSH root login on Linux servers, you need to modify the SSH daemon configuration file (`sshd_config`) and restart the SSH service.
 
 **Step-by-step solution:**
 
-1. **SSH into the server:** 
-   Connect to App Server 2 using the details provided in the [Infrastructure Details](Infrastructure_Details.md) reference.
-   For App Server 2 (`stapp02`), the user is `steve` and the password is `Am3ric@`:
+1. **SSH into each app server:** 
+   You need to perform this task on all app servers. Use the credentials from the [Infrastructure Details](Infrastructure_Details.md) reference:
+   - App Server 1 (`stapp01`): `ssh tony@stapp01` (Password: `Ir0nM@n`)
+   - App Server 2 (`stapp02`): `ssh steve@stapp02` (Password: `Am3ric@`)
+   - App Server 3 (`stapp03`): `ssh banner@stapp03` (Password: `BigGr33n`)
+
+2. **Edit the SSH configuration file:** 
+   Open the `/etc/ssh/sshd_config` file using a text editor like `vi` or `nano` with `sudo` privileges:
    ```bash
-   ssh steve@stapp02
+   sudo vi /etc/ssh/sshd_config
    ```
 
-2. **Create the user:** 
-   Run the following command with `sudo` privileges to create the user `kareem` with the expiry date `2027-04-15`:
+3. **Disable root login:** 
+   Find the line that contains `PermitRootLogin`. It might be commented out with a `#` or set to `yes` (or `prohibit-password`). 
+   To edit this in the `vi` editor:
+   - Press the `i` key on your keyboard to enter **Insert Mode**.
+   - Modify the line to exactly: `PermitRootLogin no` (make sure to remove the `#` at the beginning if there is one).
+   - Press the `Esc` key to exit Insert Mode.
+   - Type `:wq` and press `Enter` to save the file and quit the editor.
+
+4. **Test and restart the SSH service:** 
+   Before restarting the service, it's a best practice to test the SSH configuration for any syntax errors. If the test passes, restart the daemon, and then `exit` to disconnect from the server:
    ```bash
-   sudo useradd -e 2027-04-15 kareem
+   sudo sshd -t
+   sudo systemctl restart sshd
+   exit
    ```
 
-3. **Verify the user expiry:** 
-   You can verify that the account expiration date was set correctly using the `chage` command:
-   ```bash
-   sudo chage -l kareem
-   ```
-   *(Look for the "Account expires" field in the output to confirm it says April 15, 2027).*
+5. **Repeat:** 
+   Ensure you repeat steps 1-4 for **all** the app servers specified in the Datacenter infrastructure.

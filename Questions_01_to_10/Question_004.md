@@ -1,37 +1,63 @@
-# Question 4
+# Question 5
 
 ## Question:
 
-In a bid to automate backup processes, the xFusionCorp Industries sysadmin team has developed a new bash script named `xfusioncorp.sh`. While the script has been distributed to all necessary servers, it lacks executable permissions on App Server 1 within the Stratos Datacenter.
+Following a security audit, the xFusionCorp Industries security team has opted to enhance application and server security with SELinux. To initiate testing, the following requirements have been established for App server 2 in the Stratos Datacenter:
 
-Your task is to grant executable permissions to the `/tmp/xfusioncorp.sh` script on App Server 1. Additionally, ensure that all users have the capability to execute it.
+1. Install the required `SELinux` packages.
+2. Permanently disable SELinux for the time being; it will be re-enabled after necessary configuration changes.
+3. No need to reboot the server, as a scheduled maintenance reboot is already planned for tonight.
+4. Disregard the current status of SELinux via the command line; the final status after the reboot should be `disabled`.
 
 ## Answer:
 
-To grant executable permissions to a file so that all users can execute it, you can use the `chmod` command with the absolute mode `755`.
+*Refer to the [Infrastructure Details](Infrastructure_Details.md) for server credentials if needed.*
+
+To complete this task, you need to install the SELinux packages on App Server 2 and modify the persistent SELinux configuration file. 
+
+**Important Notes:**
+- **Do NOT** run `setenforce 0` as the solution. The task explicitly says to disregard the current runtime status via the command line. They are checking the persistent configuration in `/etc/selinux/config`.
+- **Do NOT** reboot the server because a maintenance reboot is already scheduled.
 
 **Step-by-step solution:**
 
-1. **SSH into App Server 1:** 
-   Connect to App Server 1 (`stapp01`) using the credentials from the [Infrastructure Details](Infrastructure_Details.md) reference. The user is `tony` and the password is `Ir0nM@n`:
+1. **SSH into App Server 2:** 
+   Connect to App Server 2 using the credentials from the [Infrastructure Details](Infrastructure_Details.md) reference (User: `steve`, Password: `Am3ric@`):
    ```bash
-   ssh tony@stapp01
+   ssh steve@stapp02
    ```
 
-2. **Grant executable permissions:** 
-   Use the `chmod` command with the absolute mode `755` (read, write, execute for owner; read and execute for group and others) to ensure the script is executable by everyone:
+2. **Install the required SELinux packages:** 
+   Use `yum` to install the `selinux-policy` and `selinux-policy-targeted` packages:
    ```bash
-   sudo chmod 755 /tmp/xfusioncorp.sh
+   sudo yum install -y selinux-policy selinux-policy-targeted
    ```
 
-3. **Verify the permissions:** 
-   Check the file permissions using the `ls -l` command to ensure the `x` (executable) bit is set for the owner, group, and others:
+3. **Verify the installation:** 
+   You can verify the packages were installed successfully:
    ```bash
-   ls -l /tmp/xfusioncorp.sh
+   rpm -qa | grep selinux
    ```
-   *You should see an output containing `rwxr-xr-x` (or similar), indicating that the `x` flag is present for user, group, and others.*
 
-4. **Exit the server:**
+4. **Permanently disable SELinux:** 
+   Open the SELinux configuration file using the `vi` editor:
+   ```bash
+   sudo vi /etc/selinux/config
+   ```
+   - Press the `i` key to enter **Insert Mode**.
+   - Find the line that says `SELINUX=enforcing` (or similar).
+   - Change it exactly to: `SELINUX=disabled`
+   - Press the `Esc` key to exit Insert Mode.
+   - Type `:wq` and press `Enter` to save the file and quit the editor.
+
+5. **Verify the configuration change:** 
+   Check the `/etc/selinux/config` file to ensure the change was saved correctly:
+   ```bash
+   grep '^SELINUX=' /etc/selinux/config
+   ```
+   *(The output should be `SELINUX=disabled`)*
+
+6. **Exit the server:**
    ```bash
    exit
    ```
